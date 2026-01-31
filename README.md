@@ -193,14 +193,6 @@ All contributions are reviewed before being merged. Please ensure that your chan
 
 ---
 <br>
-<h2 align="center">References</h2>
-
-1. **OSDev.org** - [The Missing Manual for Kernel Development](https://wiki.osdev.org/).  
-2. **ASCII Art Archive** - [Sprite Inspiration and Modeling](https://www.asciiart.eu/).  
-3. **Intel® 64 and IA-32 Architectures** - [Hardware Reference Manuals](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html).  
-
----
-<br>
 <p align="center">
   <a href="mailto:777eerol.exe@gmail.com">
     <img src="https://cdn.simpleicons.org/gmail/D14836" width="40" alt="Email">
