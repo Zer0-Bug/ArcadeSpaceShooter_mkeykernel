@@ -1,4 +1,4 @@
-<h1 align="center">Space Shooter: Bare-Metal x86 Engine</h1>
+<h1 align="center">Arcade Space Shooter: mkeykernel Edition</h1>
 
 <p align="center">
   <a href="https://en.wikipedia.org/wiki/C_(programming_language)">
@@ -7,11 +7,11 @@
   <a href="https://en.wikipedia.org/wiki/X86_instruction_listings">
     <img src="https://img.shields.io/badge/x86_Assembly-6E4C13?style=for-the-badge" alt="x86 ASM">
   </a>
-  <a href="https://isocpp.org/">
-    <img src="https://img.shields.io/badge/Protected_Mode-32--bit-blue?style=for-the-badge" alt="32-bit PM">
+  <a href="https://github.com/arjun024/mkeykernel">
+    <img src="https://img.shields.io/badge/mkeykernel-OS-orange?style=for-the-badge" alt="mkeykernel">
   </a>
   <a href="https://en.wikipedia.org/wiki/VGA-compatible_text_mode">
-    <img src="https://img.shields.io/badge/VGA-Text_Mode-red?style=for-the-badge" alt="VGA Text">
+    <img src="https://img.shields.io/badge/VGA-Text_Mode-blue?style=for-the-badge" alt="VGA Text">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-darkred?style=for-the-badge" alt="License">
@@ -19,11 +19,11 @@
 </p>
 
 <p align="center">
-  A highly optimized <b>Bare-Metal Space Shooter</b> built from scratch as a standalone <b>x86 Operating System Kernel</b>. This project bypasses all traditional abstraction layers, utilizing direct <b>Interrupt Descriptor Table (IDT)</b> management and <b>VGA Text Buffer</b> manipulation to deliver an atmospheric arcade experience directly on top of the CPU.
+  A high-performance x86 <b>Arcade Space Shooter</b> built upon the <b>mkeykernel</b> framework developed by <b>Arjun Sreedharan</b>. This project leverages the bare-metal capabilities of mkeykernel—including custom interrupt handling and direct video memory manipulation—to implement a fully responsive space combat simulation directly in the system's VGA text buffer.
 </p>
 
 <p align="center">
-  <a href="#low-level-architecture">
+  <a href="#mkeykernel-architecture">
     <img src="https://img.shields.io/badge/Architecture-222222?style=flat" />
   </a>
   <span> ° </span>
@@ -31,7 +31,7 @@
     <img src="https://img.shields.io/badge/Structure-222222?style=flat" />
   </a>
   <span> ° </span>
-  <a href="#kernel-mechanics">
+  <a href="#arcade-mechanics">
     <img src="https://img.shields.io/badge/Mechanics-222222?style=flat" />
   </a>
   <span> ° </span>
@@ -47,14 +47,14 @@
 ---
 <br>
 
-<h2 align="center">Low-Level Architecture</h2>
+<h2 align="center">mkeykernel Architecture</h2>
 
-This project is a masterclass in custom kernel development, featuring a specialized architecture designed for real-time responsiveness:
+This project is deeply integrated with the architecture defined in the **mkeykernel** project, a minimal x86 kernel designed for educational exposure to hardware-level programming:
 
-1.  **Interrupt-Driven Input:** Implements a custom **IDT (Interrupt Descriptor Table)** to register a high-priority hardware interrupt handler for IRQ1 (Keyboard), ensuring zero input lag by reading scancodes directly from `0x60` data ports.
-2.  **VGA Buffer Pipeline:** Renders game state by manipulating the hardware video memory at `0xb8000`. It utilizes a 25-line by 80-column character matrix with specialized byte offsets for lightning-fast ASCII sprite updates.
-3.  **Assembly Bootstrapping:** A custom `kernel.asm` loader sets up the 32-bit Protected Mode environment, establishing the global stack and enabling the CPU to transition into the high-level C `kmain` entry point.
-4.  **Hardware Port I/O:** Uses custom `read_port` and `write_port` assembly wrappers to communicate with the **Programmable Interrupt Controller (PIC)** and keyboard hardware status registers.
+1.  **Framework Foundation:** Utilizes the base kernel implementation by Arjun Sreedharan, featuring a Multiboot-compliant header and a 32-bit Protected Mode environment initialized via `kernel.asm`.
+2.  **Interrupt Descriptor Table (IDT):** Implements a custom IDT to register the `keyboard_handler`. This allows the game to capture and process physical scancodes from the keyboard controller (Port `0x60`) with zero abstraction.
+3.  **VGA Text Buffer Pipeline:** Directly writes memory patterns to `0xb8000`. By treating the text buffer as a 2D coordinate space (80x25), the engine renders high-speed ASCII sprites and UI elements with minimal CPU overhead.
+4.  **Hardware Port I/O:** Employs Assembly wrappers for `in` and `out` instructions to communicate with the **Programmable Interrupt Controller (PIC)**, ensuring proper IRQ mapping and EOI (End of Interrupt) signaling.
 
 ---
 <br>
@@ -66,14 +66,13 @@ ArcadeSpaceShooter_mkeykernel/
 ├── LICENSE                                   # MIT License
 ├── README.md                                 # Project documentation
 │
-├── mkeykernel/                               # Bare-Metal Kernel Source
-│   ├── kernel.c                              # Main Engine & Interrupt Logic
-│   ├── kernel.asm                            # Assembly Entry & Environment Setup
-│   ├── keyboard_map.h                        # Scancode to ASCII definitions
-│   ├── link.ld                               # Linker Script (x86 positioning)
-│   ├── binary_x86/
-│   │   └── kernel                            # Compiled x86 Kernel Binary
-│   └── kc.o / kasm.o                         # Compiled Object Files
+├── mkeykernel/                               # Kernel Source & Engine
+│   ├── kernel.c                              # Integrated Game Logic (Credit: mkeykernel)
+│   ├── kernel.asm                            # Assembly Entry (Arjun Sreedharan)
+│   ├── keyboard_map.h                        # Scancode Definitions
+│   ├── link.ld                               # Linker Script for x86 Positioning
+│   ├── binary_x86/                           # Compiled kernel binaries
+│   └── ...                                   # Object artifacts
 │
 └── Screenshots/                              # Engine Previews in Simulation
     ├── mkeykernel_v1.PNG
@@ -84,11 +83,11 @@ ArcadeSpaceShooter_mkeykernel/
 ---
 <br>
 
-<h2 align="center">Kernel Mechanics</h2>
+<h2 align="center">Arcade Mechanics</h2>
 
 - **ASCII Sprite Modeling**: Detailed multi-character shuttle designs (`/ ]\`, `< ( ] >`) rendered via direct video memory offsets.
 - **Asynchronous Input Loop**: High-frequency polling of the keyboard status port to manage movement and firing simultaneously with the main loop.
-- **Deterministic Spawning**: Implements a custom **Pseudo-Random Number Generator (PRNG)** using an LCG algorithm for consistent enemy waves.
+- **Deterministic Spawning**: Implements a custom Pseudo-Random Number Generator (PRNG) using an LCG algorithm for consistent enemy waves.
 - **AABB Collision Logic**: Precise Hit-Box detection calculated across the 80x25 character grid.
 - **Color Optimization**: Utilizes VGA attribute bytes to render sprites in high-contrast white (0x0F) against a void background.
 
@@ -127,24 +126,24 @@ ArcadeSpaceShooter_mkeykernel/
     <th align="center">Specification</th>
   </tr>
   <tr>
-    <td align="center"><b>Execution Layer</b></td>
-    <td align="center">32-bit Protected Mode (Bare-Metal)</td>
+    <td align="center"><b>Base Kernel</b></td>
+    <td align="center">mkeykernel (Arjun Sreedharan)</td>
   </tr>
   <tr>
-    <td align="center"><b>Video Memory</b></td>
-    <td align="center">0xB8000 (VGA Text Buffer)</td>
+    <td align="center"><b>CPU Mode</b></td>
+    <td align="center">32-bit Protected Mode (x86)</td>
   </tr>
   <tr>
-    <td align="center"><b>Input Protocol</b></td>
-    <td align="center">Direct Port 0x60 / 0x64 I/O</td>
+    <td align="center"><b>Video Base</b></td>
+    <td align="center">0xB8000 (Color Text Buffer)</td>
   </tr>
   <tr>
     <td align="center"><b>Interrupts</b></td>
-    <td align="center">Custom IDT / IRQ1 Mapping</td>
+    <td align="center">IDT / IRQ 1 (Keyboard)</td>
   </tr>
   <tr>
-    <td align="center"><b>Resolution</b></td>
-    <td align="center">80 Columns x 25 Lines</td>
+    <td align="center"><b>Linker Format</b></td>
+    <td align="center">ELF i386 (Linker Mapping)</td>
   </tr>
 </table>
 
@@ -156,17 +155,24 @@ ArcadeSpaceShooter_mkeykernel/
 ### 1. Build Environment
 You require `nasm` for assembly compilation and a C cross-compiler (e.g., `gcc` targeting `elf_i386`) for the kernel logic.
 
-### 2. Physical/Virtual Deployment
-1. Navigate to the `mkeykernel/` directory.
-2. Compile and link using the provided linker script (`link.ld`):
-   ```bash
-   nasm -f elf32 kernel.asm -o kasm.o
-   gcc -m32 -c kernel.c -o kc.o
-   ld -m elf_i386 -T link.ld -o kernel kasm.o kc.o
-   ```
+### 2. Acquisition
+```bash
+git clone https://github.com/Zer0-Bug/ArcadeSpaceShooter_mkeykernel.git
+```
+```bash
+cd ArcadeSpaceShooter_mkeykernel/mkeykernel
+```
 
-### 3. Execution (QEMU)
-Launch the standalone kernel in an emulator to observe the bare-metal logic:
+### 3. Compilation
+Link the assembly and C components using the provided script:
+```bash
+nasm -f elf32 kernel.asm -o kasm.o
+gcc -m32 -c kernel.c -o kc.o
+ld -m elf_i386 -T link.ld -o kernel kasm.o kc.o
+```
+
+### 4. Execution (QEMU)
+Launch the standalone kernel directly in your emulator:
 ```bash
 qemu-system-i386 -kernel kernel
 ```
